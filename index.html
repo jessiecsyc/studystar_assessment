@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+   <head>
+       <title>StudyStar</title>
+       <link rel="icon" type="image/png" href="logo.png"> 
+       <link rel="stylesheet" href="studystar.css">
+       <link rel="preconnect" href="https://fonts.googleapis.com">
+       <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+       <link href="https://fonts.googleapis.com/css?family=Google Sans Flex:wght@400;600&display=swap" rel="stylesheet">
+   </head>
+   <body>
+    <!--nav bar-->
+        <nav class="nav-container">
+        <button class="nav-btn" data-target="home">Home</button>
+        <button class="nav-btn" data-target="hub">Hub</button>
+        <button class="nav-btn" data-target="calendar">Calendar</button>
+        <button class="nav-btn" data-target="analytics">Analytics</button> 
+        <button class="nav-btn" data-target="settings">Settings</button> 
+    </nav>
+    <!--home page-->
+       <main class="content-container">
+        <section id="home" class="page active">
+            <h1 id="homeHeading" >StudyStar!</h1>
+            <p>You're a Star!</p>
+            <img src="logo.png" alt="StudyStar Logo" class="logo">
+            <p>Hello!</p>
+            <input type="text" id="Name" placeholder="Your Name..">
+            <button class="submit-btn" id="submitName">Submit Name</button>
+            <button class="clear-btn" data-target="reset">Clear Name</button>
+        </section>
+    <!--hub page-->
+        <section id="hub" class="page hidden">
+            <h1 id="hubHeading">Your Study Hub</h1>
+            <p>Become a StudyStar!</p>
+            <div class="hubdiv">
+            <div class="hub-left">
+              <div class="calendar-container">
+                  <div class="calendar-header">
+                      <button id="prevMonth">&#10094;</button>
+
+                           <h2 id="monthYear"></h2>
+
+                       <button id="nextMonth">&#10095;</button>
+                  </div>
+
+                  <div class="weekdays">
+                    <div>Sun</div>
+                    <div>Mon</div>
+                    <div>Tue</div>
+                    <div>Wed</div>
+                    <div>Thu</div>
+                    <div>Fri</div>
+                    <div>Sat</div>
+                  </div>
+
+                  <div class="days-grid" id="daysGrid"></div>
+
+                  <div id="input-event" class="event-form">
+                      <h3>Schedule a New Event</h3>
+                       <div class="form-row">
+                         <input type="text" class="form-input" id="event-title" placeholder="Title*" required>
+                         <input type="number" class="form-input" id="hours-study" placeholder="Hours*" min="0.5" max="12" step="0.5" required>
+                         <input type="date" class="form-input" id="event-date" required>
+                       </div>
+
+                       <div class="form-row">
+                         <input type="time" class="form-input" id="event-time" required>
+                         <select id="subject-select" class="form-input">
+                           <option value="" disabled selected>Subject*</option>
+                           <option value="1">English</option>
+                           <option value="2">Maths</option>
+                           <option value="3">Science</option>
+                           <option value="4">History</option>
+                           <option value="5">Geography</option>
+                           <option value="custom-trigger">+ Add your own...</option>
+                         </select>
+                       </div>
+
+                       <div class="form-row">
+                         <select id="recurrence-select" class="form-input">
+                           <option value="none" selected>No repeat</option>
+                           <option value="daily">Daily</option>
+                           <option value="weekly">Weekly</option>
+                           <option value="monthly">Monthly</option>
+                         </select>
+                       </div>
+
+                       <div class="form-row">
+                         <input type="number" class="form-input" id="your-score" placeholder="Your Score" min="0">
+                         <input type="number" class="form-input" id="full-score" placeholder="Full Score" min="0">
+                       </div>
+
+                       <div class="form-row">
+                            <input type="file" id="file-input" class="form-input" accept="application/pdf, image/*">
+                        </div>
+                        <div id="attachment-preview" class="attachment-preview hidden"></div>
+
+                                            <div class="event-form-actions">
+                                                <button id="cal-btn" class="cal-btn">Add to Your Calendar</button>
+                                                <button id="cancel-edit-event" class="cancel-edit-event hidden" type="button">Cancel Edit</button>
+                                            </div>
+                  </div>
+              </div>
+              <div id="event-panel" class="event-panel hidden">
+                  <button id="close-panel">✕</button>
+                   <h3 id="selected-date">Select a date</h3>
+                   <div id="event-list">
+                   <p>Click a date to view its events.</p>
+                  </div>
+              </div>
+            </div>
+            <div class="analytics">
+                <div class="analytics-header">
+                    <h2>This Week</h2>
+                    <div id="weekly-summary" class="weekly-summary"></div>
+                </div>
+                <div class="analytics-header all-data-summary">
+                    <h2>All Time</h2>
+                    <div id="all-data-summary" class="weekly-summary"></div>
+                </div>
+            </div>
+            </div>
+        </section>
+    <!--calendar page-->
+    <section id="calendar" class="page hidden">
+
+        <h1 id="calendarHeading">Your Week</h1>
+            <p>Click to view event details.</p>
+        <div class="timeblock-container">
+
+         <div class="timeblock-header">
+
+                <button id="prevWeek">&#10094;</button>
+
+                <h2 id="weekRange"></h2>
+
+                <button id="nextWeek">&#10095;</button>
+
+         </div>
+
+          <div class="timeblock-calendar">
+
+             <div class="time-column-header"></div>
+
+             <div class="day-header" id="day-header-0">Sun</div>
+             <div class="day-header" id="day-header-1">Mon</div>
+             <div class="day-header" id="day-header-2">Tue</div>
+             <div class="day-header" id="day-header-3">Wed</div>
+             <div class="day-header" id="day-header-4">Thu</div>
+             <div class="day-header" id="day-header-5">Fri</div>
+             <div class="day-header" id="day-header-6">Sat</div>
+
+               <div class="timeblock-body" id="timeblock-body">
+
+                 <div class="time-labels" id="time-labels"></div>
+
+                 <div class="week-columns" id="week-columns">
+
+                       <div class="week-column" data-day="0"></div>
+                       <div class="week-column" data-day="1"></div>
+                       <div class="week-column" data-day="2"></div>
+                       <div class="week-column" data-day="3"></div>
+                       <div class="week-column" data-day="4"></div>
+                       <div class="week-column" data-day="5"></div>
+                       <div class="week-column" data-day="6"></div>
+
+                 </div>
+
+               </div>
+
+            </div>
+
+     </div>
+
+     <div id="calendar-event-panel" class="calendar-event-panel hidden">
+         <button id="close-calendar-panel">✕</button>
+         <div id="calendar-event-details"></div>
+     </div>
+
+     <div id="calendar-event-tooltip" class="calendar-event-tooltip hidden"></div>
+
+    </section>
+    <!--analytics page-->
+        <section id="analytics" class="page hidden">
+    <h1 id="analyticsHeading">Your Analytics</h1>
+
+    <div class="analytics-container">
+
+        <div class="analytics-card">
+            <h2>Task Score vs Hours Studied</h2>
+            <p class="analytics-description">
+                See how your study time relates to your task scores.
+            </p>
+
+            <div class="chart-container">
+                <canvas id="scoreHoursChart"></canvas>
+            </div>
+
+            <p id="noScoreAnalyticsData" class="no-analytics-data hidden">
+                Add tasks with your score, full score and study hours
+                to see your analytics.
+            </p>
+        </div>
+
+         <div class="analytics-card">
+            <h2>Hours Studied by Subject</h2>
+            <p class="analytics-description">
+                See how many hours you have studied for each subject across recent weeks.
+            </p>
+
+            <div class="chart-container">
+                <canvas id="hoursStudiedChart"></canvas>
+            </div>
+
+            <p id="noHoursAnalyticsData" class="no-analytics-data hidden">
+                Add your study hours to see your analytics.
+            </p>
+        </div>
+
+    </div>
+</section>
+    <!--settings page-->
+       <section id="settings" class="page hidden">
+            <h1>Settings</h1>
+            <div class="settings-container">
+                <div class="setting-item">
+                    <label for="toggleDark">Dark Mode</label>
+                    <input type="checkbox" id="toggleDark">
+                </div>
+                <div class="setting-item">
+                    <label for="toggleFont">Large Font</label>
+                    <input type="range" id="toggleFont" min="50" max="300" value="100">
+                </div>
+                <div class="subject-colour-settings" id="subject-colour-settings"></div>
+                <div class="align">
+                <div>
+                    <button class="print-btn" data-target="printCal">Download This Week's Calendar</button>
+                </div>
+                <div class="setting-item">
+                    <button class="clearall-btn" data-target="reset">Reset All Data</button>
+                </div> 
+            </div>
+            </div>
+            
+        </section>
+
+    </main>
+
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+            <script src="studystar.js"></script>
+   </body>
+</html>
+
+
+
