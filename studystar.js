@@ -396,7 +396,7 @@ dayEvents.forEach((event, index) => {
     const subjectLabel = event.subjectLabel || getSubjectLabel(event.subject);
 
     const sourceDate = event.recurringSourceDate || dateString;
-    const sourceIndex = event.recurringSourceIndex ?? events[dateString].indexOf(event);
+    const sourceIndex = event.recurringSourceIndex ?? (events[dateString] ? events[dateString].indexOf(event) : -1);
 
     item.innerHTML = `
         <strong>${event.title}</strong><br>
@@ -461,6 +461,10 @@ document.querySelectorAll(".delete-event").forEach(button => {
             const sourceIndex = dayEvents[index].recurringSourceIndex ?? index;
 
             const deleteTarget = events[sourceDate]?.[sourceIndex];
+            if (deleteTarget && deleteTarget.attachment && deleteTarget.attachment.key) {
+                deleteEventAttachment(deleteTarget.attachment.key);
+            }
+
             events[sourceDate].splice(sourceIndex, 1);
 
             if (events[sourceDate].length === 0) {
@@ -526,7 +530,7 @@ let currentDate = new Date();
 let selectedCalendarDate = null;
 const eventDate = document.getElementById("event-date");
 const today = new Date();
-const formattedDate = today.toISOString().split("T")[0];
+const formattedDate = formatDateKey(today);
 
 eventDate.value = formattedDate;
 function renderCalendar() {
@@ -618,10 +622,88 @@ customSubjectLabels.forEach((subject) => {
     }
 });
 
-document.getElementById('subject-select').addEventListener('change', function() {
+function promptForCustomSubject() {
+    if (typeof window !== "undefined" && typeof window.prompt === "function") {
+        try {
+            const value = window.prompt("Enter your custom label:");
+            return Promise.resolve(value);
+        } catch (error) {
+            console.warn("Native prompt unavailable, using in-app modal instead.", error);
+        }
+    }
+
+    return new Promise((resolve) => {
+        const modalId = "custom-subject-modal";
+        let modal = document.getElementById(modalId);
+        if (modal) {
+            modal.remove();
+        }
+
+        modal = document.createElement("div");
+        modal.id = modalId;
+        modal.className = "custom-subject-modal";
+
+        const dialog = document.createElement("div");
+        dialog.className = "custom-subject-dialog";
+
+        const title = document.createElement("h3");
+        title.textContent = "Add custom subject";
+
+        const label = document.createElement("label");
+        label.textContent = "Subject name";
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = "Enter your custom label";
+        input.className = "custom-subject-input";
+
+        const actions = document.createElement("div");
+        actions.className = "custom-subject-actions";
+
+        const confirmButton = document.createElement("button");
+        confirmButton.type = "button";
+        confirmButton.textContent = "Add";
+        confirmButton.className = "custom-subject-confirm";
+
+        const cancelButton = document.createElement("button");
+        cancelButton.type = "button";
+        cancelButton.textContent = "Cancel";
+        cancelButton.className = "custom-subject-cancel";
+
+        const finish = (value) => {
+            resolve(value);
+            modal.remove();
+        };
+
+        confirmButton.addEventListener("click", () => finish(input.value));
+        cancelButton.addEventListener("click", () => finish(null));
+        input.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                finish(input.value);
+            }
+            if (event.key === "Escape") {
+                event.preventDefault();
+                finish(null);
+            }
+        });
+
+        actions.appendChild(cancelButton);
+        actions.appendChild(confirmButton);
+        dialog.appendChild(title);
+        dialog.appendChild(label);
+        dialog.appendChild(input);
+        dialog.appendChild(actions);
+        modal.appendChild(dialog);
+        document.body.appendChild(modal);
+        input.focus();
+    });
+}
+
+document.getElementById('subject-select').addEventListener('change', async function() {
   if (this.value === 'custom-trigger') {
 
-    const customValue = prompt("Enter your custom label:");
+    const customValue = await promptForCustomSubject();
 
     if (customValue && customValue.trim() !== "") {
       const trimmedValue = customValue.trim();
@@ -1800,7 +1882,7 @@ function generateCalendarPDF() {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
 
-    // Time column header
+    // time column header
     doc.setFillColor(232, 217, 190);
     doc.rect(
         margin,
@@ -1819,7 +1901,7 @@ function generateCalendarPDF() {
         headerHeight
     );
 
-    // Day headers
+    // day headers
     for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
 
         const x =
@@ -1880,7 +1962,7 @@ function generateCalendarPDF() {
             headerHeight +
             (rowIndex * hourHeight);
 
-        // Time label
+        // time label
         doc.setTextColor(90, 90, 90);
 
         doc.text(
@@ -1892,7 +1974,7 @@ function generateCalendarPDF() {
             }
         );
 
-        // Horizontal grid line
+        // horizontal grid line
         doc.setDrawColor(220, 220, 220);
 
         doc.line(
@@ -1903,7 +1985,7 @@ function generateCalendarPDF() {
         );
     }
 
-    // Vertical lines
+    // vertical lines
     for (let dayIndex = 0; dayIndex <= 7; dayIndex++) {
 
         const x =
@@ -1921,7 +2003,7 @@ function generateCalendarPDF() {
         );
     }
 
-// Render events
+// render events
     for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
 
         const date = new Date(startDate);

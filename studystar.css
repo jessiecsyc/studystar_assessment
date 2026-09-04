@@ -947,6 +947,90 @@ body.dark-mode .weekly-summary-stat {
     color: #7a4b2e;
 }
 
+.custom-subject-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.38);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.custom-subject-dialog {
+    background: #faf6ed;
+    color: #2d2d2d;
+    width: min(24rem, calc(100vw - 2rem));
+    border-radius: 0.75rem;
+    box-shadow: 0 0.75rem 1.75rem rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+.custom-subject-dialog h3 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    color: #5A3B1E;
+}
+
+.custom-subject-dialog label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #5A3B1E;
+}
+
+.custom-subject-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.625rem;
+    font: inherit;
+    border: 1px solid #d0c3ac;
+    border-radius: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.custom-subject-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.custom-subject-actions button {
+    border: none;
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.875rem;
+    font: inherit;
+    cursor: pointer;
+}
+
+.custom-subject-cancel {
+    background: transparent;
+    color: #5A3B1E;
+    border: 1px solid #5A3B1E;
+}
+
+.custom-subject-confirm {
+    background: #5A3B1E;
+    color: white;
+}
+
+body.dark-mode .custom-subject-dialog {
+    background: #8e7156;
+    color: #f2e5d1;
+}
+
+body.dark-mode .custom-subject-dialog h3,
+body.dark-mode .custom-subject-dialog label,
+body.dark-mode .custom-subject-cancel {
+    color: #f2e5d1;
+}
+
+body.dark-mode .custom-subject-cancel {
+    border-color: #f2e5d1;
+}
+
 body.dark-mode .calendar-event-tooltip,
 body.dark-mode .calendar-event-panel {
     color: #5a3b1e;
