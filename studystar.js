@@ -1029,56 +1029,47 @@ function buildDayEventLayout(dayEvents) {
         })
         .sort((a, b) => a.startMinutes - b.startMinutes || b.endMinutes - a.endMinutes);
 
-    const clusters = [];
-    let currentCluster = [];
+    const layouts = [];
+    let activeColumns = [];
+    let clusterLayouts = [];
+
+    const finishCluster = () => {
+        if (clusterLayouts.length === 0) {
+            return;
+        }
+
+        const totalColumns = activeColumns.length;
+        clusterLayouts.forEach((event) => {
+            event.totalColumns = totalColumns;
+            layouts.push(event);
+        });
+
+        activeColumns = [];
+        clusterLayouts = [];
+    };
 
     sortedEvents.forEach((event) => {
-        const overlapsCurrentCluster = currentCluster.some((existing) => 
-            existing.startMinutes < event.endMinutes && event.startMinutes < existing.endMinutes
-        );
+        activeColumns = activeColumns.map((endMinutes) => (
+            endMinutes > event.startMinutes ? endMinutes : null
+        ));
 
-        if (currentCluster.length > 0 && !overlapsCurrentCluster) {
-            clusters.push(currentCluster);
-            currentCluster = [event];
-        } else {
-            currentCluster.push(event);
+        if (clusterLayouts.length > 0 && activeColumns.every((endMinutes) => endMinutes === null)) {
+            finishCluster();
         }
-    });
 
-    if (currentCluster.length > 0) {
-        clusters.push(currentCluster);
-    }
+        let columnIndex = 0;
+        while (columnIndex < activeColumns.length && activeColumns[columnIndex] !== null) {
+            columnIndex += 1;
+        }
 
-    const layouts = [];
-
-    clusters.forEach((cluster) => {
-        const clusterColumns = [];
-
-        const clusterColumnCount = cluster.reduce((maxColumns, event) => {
-            let simultaneousEvents = 0;
-            cluster.forEach((candidate) => {
-                if (event.startMinutes < candidate.endMinutes && candidate.startMinutes < event.endMinutes) {
-                    simultaneousEvents += 1;
-                }
-            });
-            return Math.max(maxColumns, simultaneousEvents);
-        }, 1);
-
-        cluster.forEach((event) => {
-            let columnIndex = 0;
-            while (columnIndex < clusterColumns.length && clusterColumns[columnIndex] > event.startMinutes) {
-                columnIndex += 1;
-            }
-
-            clusterColumns[columnIndex] = event.endMinutes;
-
-            layouts.push({
-                ...event,
-                columnIndex,
-                totalColumns: clusterColumnCount
-            });
+        activeColumns[columnIndex] = event.endMinutes;
+        clusterLayouts.push({
+            ...event,
+            columnIndex
         });
     });
+
+    finishCluster();
 
     return layouts.sort((a, b) => a.startMinutes - b.startMinutes || a.columnIndex - b.columnIndex);
 }
@@ -1142,13 +1133,13 @@ function renderTimeblockCalendar() {
             eventElement.classList.add("timeblock-event");
 
             const gridWidth = Math.max(1, event.totalColumns || 1);
-            const leftPercent = (event.columnIndex / gridWidth) * 100 + 1;
-            const widthPercent = Math.max(20, 100 / gridWidth - 4);
+            const leftPercent = (event.columnIndex / gridWidth) * 100;
+            const widthPercent = 100 / gridWidth;
 
             eventElement.style.top = `${Math.max(top, 0)}px`;
             eventElement.style.height = `${Math.max(height, 35)}px`;
-            eventElement.style.left = `${leftPercent}%`;
-            eventElement.style.width = `${widthPercent}%`;
+            eventElement.style.left = `calc(${leftPercent}% + 3px)`;
+            eventElement.style.width = `calc(${widthPercent}% - 6px)`;
             eventElement.style.right = "auto";
             eventElement.style.zIndex = String(10 + event.columnIndex);
 
